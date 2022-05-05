@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
+# 1. 패키지 로딩
 from matplotlib.colors import is_color_like
 import numpy as np
 import matplotlib.pyplot as plt
 import miro_func as f
-# 초기상태의 미로 모습
-
-# 전체 그림의 크기 및 그림을 나타내는 변수 선언
+# 2. 초기상태의 미로 모습
+## 전체 그림의 크기 및 그림을 나타내는 변수 선언
 fig = plt.figure(figsize=(5,5))
 ax = plt.gca()
-
-
-#붉은 벽 그리기
+## 붉은 벽 그리기
 plt.plot([1,1],[0,1],color = 'red', linewidth = 2)
 plt.plot([1,2],[2,2],color = 'red', linewidth = 2)
 plt.plot([2,2],[2,1],color = 'red', linewidth = 2)
 plt.plot([2,3],[1,1],color = 'red', linewidth = 2)
 
-#상태를 의미하는 문자열(S0-S8)표시
+##상태를 의미하는 문자열(S0-S8)표시
 plt.text(0.5,2.5,'S0',size=14,ha='center')
 plt.text(1.5,2.5,'S1',size=14,ha='center')
 plt.text(2.5,2.5,'S2',size=14,ha='center')
@@ -34,12 +32,12 @@ ax.set_ylim(0,3)
 
 plt.tick_params(axis = 'both', which = 'both',bottom=False,top=False,labelbottom=False,right=False,left=False,labelleft=False)
 
-#S0에 녹샌 원으로 현재 위치를 표시
+##S0에 녹샌 원으로 현재 위치를 표시
 line, = ax.plot([0.5],[2.5],marker="o",color='g',markersize=60)
 
-# 정책을 결정하는 파라미터의 초깃값 theta_0을 설정
+#3. 정책을 결정하는 파라미터의 초깃값 theta_0을 설정
 
-# 줄은 상태 0~7, 열은 행동 방향(상 , 우 , 하, 좌 순)--> 시계 방향
+## 줄은 상태 0~7, 열은 행동 방향(상 , 우 , 하, 좌 순)--> 시계 방향
 theta_0 = np.array([[np.nan,1,     1,     np.nan], #s0
                     [np.nan,1,     np.nan,1],      #s1
                     [np.nan,np.nan,1,     1],      #s2     
@@ -49,6 +47,7 @@ theta_0 = np.array([[np.nan,1,     1,     np.nan], #s0
                     [1,     np.nan,np.nan,np.nan], #s6
                     [1,     1,     np.nan,np.nan], #s7
                     ]) #s8은 목표지점이므로 정책이 없다.
+
 
 
 ## The Initial state Of Action Value function
@@ -61,7 +60,7 @@ Q = np.random.rand(a,b) * theta_0 # Generate 8 x 4 random number matrix
 
 ## Calculate Random action policy pi_0
 pi_0 = f.simple_convert_into_pi_from_theta(theta_0)
-print(pi_0)
+
 ## Escape the maze with the Sarsa algorithm
 
 eta = 0.1 # learning rate
