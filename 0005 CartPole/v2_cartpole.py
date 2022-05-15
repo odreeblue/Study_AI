@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Package import to be used for implementation
+from csv import writer
 import numpy as np
 import matplotlib.pyplot as plt
 import gym
@@ -35,6 +36,7 @@ def display_frames_as_gif(frames):
         patch.set_data(frames[i])
 
     anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(frames), interval=50)
+    #writer = animation.FFMpegFileWriter(fps=1)
     anim.save('movie_cartpole.mp4') # The part where i save the animation
     display(display_animation(anim, default_mode = 'loop'))
 
@@ -111,7 +113,9 @@ class Environment:
     def __init__(self):
         self.env = gym.make(ENV) # 실행할 태스크를 설정
         num_states = self.env.observation_space.shape[0] # 태스크의 상태 변수 수를 구함
+        print("num_states:  " + str(num_states))
         num_actions = self.env.action_space.n # 가능한 행동 수를 구함
+        print("num_actions:  " + str(num_actions))
         self.agent = Agent(num_states, num_actions) #에이전트 객체를 생성
 
     def run(self):
@@ -158,14 +162,6 @@ class Environment:
             if complete_episodes >= 10: # 10 에피소드 연속으로 성공한 경우
                 print('10 에피소드 연속 성공')
                 is_episode_final = True # 다음 에피소드가 마지막 에피소드가 됨
-
-
-                    
-
-
-
-
-
 
 # main
 cartpole_env = Environment()

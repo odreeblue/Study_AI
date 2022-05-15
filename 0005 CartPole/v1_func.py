@@ -22,3 +22,4 @@ def display_frames_as_gif(frames):
 
     anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(frames), interval=50)
     anim.save('movie_cartpole.mp4') # The part where i save the animation
+    

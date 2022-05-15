@@ -69,7 +69,19 @@ def Sarsa(s, a, r, s_next, a_next, Q, eta, gamma,ver):
         Q[s, a] = Q[s, a] +eta * (r +gamma*Q[s_next, a_next] - Q[s,a])
     
     return Q
+## modify the action policy function Q with Sarsa Algorithm
+def Q_learning(s, a, r, s_next, Q, eta, gamma,ver):
+    if ver == "small":
+        number = 8
+    elif ver == "large":
+        number = 49
 
+    if s_next == number:
+        Q[s, a] = Q[s, a] +eta * (r - Q[s,a])
+    else:
+        Q[s, a] = Q[s, a] +eta * (r +gamma*np.nanmax(Q[s_next, :]) - Q[s,a])
+    
+    return Q
 ## function to get out of the maze with Sarsa algorithm, print state, action, history of Q value
 def goal_maze_ret_s_a_Q(Q, epsilon, eta, gamma, pi, ver):
     s = 0 # initial state
@@ -94,7 +106,8 @@ def goal_maze_ret_s_a_Q(Q, epsilon, eta, gamma, pi, ver):
             a_next = get_action(s_next, Q, epsilon, pi)
             # Calculate next action(a_next)
         # Modify the value function
-        Q = Sarsa(s, a, r, s_next, a_next, Q, eta, gamma, ver)
+        ##Q = Sarsa(s, a, r, s_next, a_next, Q, eta, gamma, ver)
+        Q = Q_learning(s, a, r, s_next, Q, eta, gamma, ver)
         # End decision
         if s_next == criteria: # End if agent reches the target point
             break
