@@ -124,11 +124,12 @@ class Brain:
                 # 이를 torch.FloatTensor of size BATCH_SIZE * 4 형태로 변형한다
                 # 상태, 행동, 보상, non_final 상태로 된 미니배치를 나타내는 Variable을 생성
                 # cat은 Concatenates(연접)을 의미함
+                
                 state_batch = torch.cat(batch.state)
                 action_batch = torch.cat(batch.action)
                 reward_batch = torch.cat(batch.reward)
                 non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
-
+                
                 #----------------------------------------------------
                 # 3 정답신호로 사용할 Q(s_t, a_t)를 계산  
                 #----------------------------------------------------
