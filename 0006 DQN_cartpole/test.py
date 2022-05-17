@@ -1,15 +1,11 @@
 from collections import namedtuple
 import torch
-Transition = namedtuple('Transition',('state','action','next_state','reward'))
 
+#text = "word1anotherword23nextone456lastone333"
+#numbers = [x for x in text if x.isdigit()]
+#print(numbers)
 
-
-memory = [[[1,2,3,4]],[2],[3],[4]]
-print(memory)
-print(type(memory))
-
-batch = Transition(*zip(*memory))
-print(batch)
-
-state_patch = torch.cat(batch.state)
-print(state_patch)
+t = torch.FloatTensor([[3.0, 1.0,4.0,100.0]])
+print(t.max(1))
+print(t.max(1)[1])
+print(t.max(1)[1].view(1,1))

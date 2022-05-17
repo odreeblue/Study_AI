@@ -180,14 +180,20 @@ class Brain:
                 self.optimizer.step() # 결합 가중치 수정
         
         def decide_action(self, state, episode):
+                #state = FloatTensor [[-0.01, -0.024, -0.005, -0.031]]
+                #episode = 0
                 '''현재 상태에 따라 행동을 결정한다'''
                 # e-greedy 알고리즘에서 서서히 최적행동의 비중을 늘린다
                 epsilon = 0.5 * (1/ (episode+1))
-
+                # epsilon = 0.5 *(1/(0+1)) = 0.5
                 if epsilon <= np.random.uniform(0,1):
                         self.model.eval() # 신경망을 추론모드로 전환
                         with torch.no_grad():
                                 action = self.model(state).max(1)[1].view(1,1)
+                                # self.model(state) = tensor([[0.1870, 0.1316]])
+                                # self.model(state).max(1) = values=tensor([0.1870]), indices=tensor([0]))
+                                # self.model(state).max(1)[1] = tensor([0]) --> size of 1
+                                # self.model(state).max(1)[1].view(1,1) = tensor([[0]])--> size of 1*1
                         # 신경망 출력의 최대값에 대한 인덱스 = max(1)[1]
                         # .view(1,1)은 [torch.LongTensor of size 1]을 size 1*1로 변환하는 역할
                 else :
@@ -207,6 +213,8 @@ class Agent:
                 self.brain.replay()
 
         def get_action(self, state, episode):
+                #state = FloatTensor [[-0.01, -0.024, -0.005, -0.031]]
+                #episode = 0
                 '''Action Determination'''
                 #action = self.brain.decide_action(observation, step) 
                 action = self.brain.decide_action(state, episode) 
@@ -225,21 +233,26 @@ class Environment:
         def run(self):
                 '''실행'''
                 episode_10_list = np.zeros(10) # 최근 10 에피소드 동안 버틴 단계수를 저장함 --> 평균 산출용
+                ##### episode_10_list = [0,0,0,0,0,0,0,0,0,0]
                 complete_episodes = 0 #현재까지 195단계를 버틴 에피소드 수
                 episode_final = False # 마지막 에피소드 여부
                 frames = [] # 애니메이션을 만들기 위해 마지막 에피소드의 프레임을 저장할 배열
 
-                for episode in range(NUM_EPISODES): #최대 에피소드 수만큼 반복
+                for episode in range(NUM_EPISODES): #최대 에피소드 수만큼 반복, NUM_EPSISODES = 500
                         observation = self.env.reset() # 환경 초기화
-                        state = observation # 관측을 변환없이 그대로 상태 s로 사용
+                        state = observation # 관측을 변환없이 그대로 상태 s로 사용 ex) Observation = -0.01, -0.024, -0.005, -0.031
+                                                                                       # numpy [-0.01, -0.024, -0.005, -0.031]
                         state = torch.from_numpy(state).type(torch.FloatTensor) # Numpy변수를 파이토치 텐서로 변환
+                                                                # state=> FloatTensor [-0.01, -0.024, -0.005, -0.031]
                         state = torch.unsqueeze(state, 0)# size 4를 size 1*4 로 변환
-
-                        for step in range(MAX_STEPS): # 1에피소드에 해당하는 반복문
+                                                                # state=> FloatTensor [[-0.01, -0.024, -0.005, -0.031]]
+                        for step in range(MAX_STEPS): # 1에피소드에 해당하는 반복문 MAX_STEPS = 200
                                 if episode_final is True : #마지막 에피소드에서는 각 시각의 이미지를 frames에 저장
                                         frames.append(self.env.render(mode='rgb_array'))
                                 action = self.agent.get_action(state, episode) # 다음 행동을 결정
-
+                                                #state = FloatTensor [[-0.01, -0.024, -0.005, -0.031]]
+                                                #episode = 0
+                                #return 된 action = > tensor([[0]])
                                 # 행동 a_t를 실행해 다음 상태 s_t+1 과 done 플래그 값을 결정
                                 # action에 .item()을 호출해 행동 내용을 구함
                                 observation_next,_,done,_ = self.env.step(action.item()) #reward와 info는 사용하지 않음 _처리
