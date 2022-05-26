@@ -192,7 +192,7 @@ class Brain:
                         # .view(1,1)은 [torch.LongTensor of size 1]을 size 1*1로 변환하는 역할
                 else :
                         # 행동을 무작위로 반환(0 혹은 1)
-                        action = torch.LongTensor([[random.randrange(self.num_actions)]])#행동을 무작위로 반환(0 OR 1)
+                        action = torch.LongTensor([[random.randrange(self.num_actions)]])#행동을 무작위로 반환(0 OR 1 OR 2 OR 3)
                         # action은 [torch.LongTensor of size 1*1]형태가 된다
                 return action
 

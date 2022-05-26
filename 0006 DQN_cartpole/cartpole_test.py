@@ -144,17 +144,17 @@ class Brain:
                 # 여기서부터는 실행한 행동 a_t에 대한 Q값을 계산하므로 action_batch에서 취한 행동 a_t가 왼쪽이냐, 오른쪽이냐에
                 # 대한 인덱스를 구하고, 이에 대한 Q값을 gater 메서드로 모아온다
                 #print("self.model(state_batch): ", self.model(state_batch))
-                state_action_values = self.model(state_batch).gather(1,action_batch)
+                state_action_values = self.model(state_batch).gather(1,action_batch)# gather --> 1: 열방향으로, action_batch(0,1)에 따라 모아라
+                                                                                                                # 0이면 첫번째 열 값, 1이면 두번째 열 값
                 #print("self.model(state_batch).gather(1,action_batch): ",self.model(state_batch).gather(1,action_batch))
 
                 # 3.3 max{Q(s_t+1, a)} 값을 계산한다. 이 때 다음 상태가 존재하는지 주의해야 한다.
-
                 # cartpole이 done 상태가 아니고, next_state가 존재하는지 확인하는 인덱스마스크를 만듬
                 non_final_mask = torch.ByteTensor(tuple(map(lambda s: s is not None, batch.next_state)))
                 #print("non_final_mask  :", non_final_mask)
 
                 # 먼저 전체를 0으로 초기화
-                next_state_values = torch.zeros(BATCH_SIZE)
+                next_state_values = torch.zeros(BATCH_SIZE)# print : tensor([0., 0., ...., 0.])
 
                 # 다음상태가 있는 인덱스에 대한 최대 Q값을 구한다
                 # 출력에 접근해서 열방향 최댓값(max(1))이 되는 [값, 인덱스]를 구한다
@@ -253,6 +253,8 @@ class Environment:
                                                 #state = FloatTensor [[-0.01, -0.024, -0.005, -0.031]]
                                                 #episode = 0
                                 #return 된 action = > tensor([[0]])
+                                # "현재상태(St)" -input-> "행동결정함수" -output-> "Action" -input-> "ENV" -output-> "Observation(St+1)"
+                                
                                 # 행동 a_t를 실행해 다음 상태 s_t+1 과 done 플래그 값을 결정
                                 # action에 .item()을 호출해 행동 내용을 구함
                                 observation_next,_,done,_ = self.env.step(action.item()) #reward와 info는 사용하지 않음 _처리
