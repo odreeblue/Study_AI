@@ -320,7 +320,7 @@ class Environment:
                                 # 메모리에 경험을 저장
                                 self.agent.memorize(state,action,state_next, reward)
                                 # Experience Replay로 Q함수를 수정
-                                self.agent.update_q_function()
+                                self.agent.update_q_function()# --> 여기가 하이라이트임
                                 # 관측 결과를 업데이트
                                 state = state_next
                                 # 에피소드 종료 처리
