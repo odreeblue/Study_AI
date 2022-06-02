@@ -48,7 +48,7 @@ Transition = namedtuple('Transition',('state','action','next_state','reward'))
 ENV = 'CartPole-v0' # 태스크 이름
 GAMMA  = 0.99 # 시간 할인율
 MAX_STEPS =200 #  1에피소드 당 최대 단계 수
-NUM_EPISODES = 500 # 최대 에피소드 수
+NUM_EPISODES = 2 # 최대 에피소드 수
 
 # 4. Transition을 저장하기 위한 메모리 클래스
 class ReplayMemory:
@@ -82,7 +82,8 @@ import torch
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
-#torch.random.manual_seed(777)
+torch.random.manual_seed(777)
+#random.seed(100)
 BATCH_SIZE = 32
 CAPACITY = 10000
 
@@ -147,6 +148,10 @@ class Brain:
             if epsilon <= np.random.uniform(0,1):
                 self.main_q_network.eval() # 신경망을 추론모드로 전환
                 with torch.no_grad():
+                    print("self.main_q_network(state) : ",self.main_q_network(state))
+                    print(".max(1): ",self.main_q_network(state).max(1))
+                    print(".max(1)[1]: ",self.main_q_network(state).max(1)[1])
+
                     action = self.main_q_network(state).max(1)[1].view(1,1)
                     # 신경망 출력의 최대값에 대한 인덱스 = max(1)[1]
                     # .view(1,1)은 [torch.LongTensor of size 1]을 size 1*1로 변환하는 역할
@@ -279,12 +284,12 @@ class Environment:
 
                 for episode in range(NUM_EPISODES): #최대 에피소드 수만큼 반복
                         observation = self.env.reset() # 환경 초기화
-                        state = observation # 관측을 변환없이 그대로 상태 s로 사용
+                        #state = observation
+                        state = np.array([0.01455678,0.04944178,-0.03826025,0.01432143]) # 관측을 변환없이 그대로 상태 s로 사용  
                         state = torch.from_numpy(state).type(torch.FloatTensor) # Numpy변수를 파이토치 텐서로 변환
                         state = torch.unsqueeze(state, 0)# size 4를 size 1*4 로 변환
-
+                        print(state)
                         for step in range(MAX_STEPS): # 1에피소드에 해당하는 반복문
-
                                 #if episode_final is True : #마지막 에피소드에서는 각 시각의 이미지를 frames에 저장
                                 #        frames.append(self.env.render(mode='rgb_array'))
                                 action = self.agent.get_action(state, episode) # 다음 행동을 결정

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-# DDQN Double-Q러닝과 DQN을 조합한 것
-# Q러닝이나 DQN에서는 행동가치함수 Q(s,a)를 학습하는데 다시 행동가치 함수 Q를 사용해야했는데
-# 이 때문에 학습이 불안정해지기 쉬웠다. DDQN에서는 단점을 보완해서 두개의 신경망을 사용해 행동가치함수 Q를 수정
-# Target Q-Network를 수정해서 Main Q-Network와 일치시키는 방법을 사용한다.
-# Q_m(s_t,a_t) = Q_m(s_t,a_t) + eta * (R_t+1 + gamma * maxa_Qt(s_t+1,a)-Q_m(s_t,a_t))
-# DDQN은 이 수정식을 더욱 안정화 시킨 것임
-# a_m = arg maxa Q_m(s_t+1,a)
-# Q_m(s_t,a_t) = Q_m(s_t,a_t) + eta * (R_t+1 + gamma * Q_t(s_t+1,a_m)-Q_m(s_t,a_t))
-# 다음 상태 s_t+1에서 Q값이 최대가 되는 행동 a_m은 Main Q-Network에서 구하고, 그때의 Q값은 Target Q-Network에서 구한다
-# 이렇게 두개의 신경망이 사용되기 때문에 Double DQN이라능 이름이 붙었음
+# Dueling Network
+# 기존의 DQN은 어떤 행동을 취하든 받게되는 할인총보상이 상태 s에 의해서만 결정되는 면이있음
+# 예를들면, 상태 s가 거의 쓰러지기 직전이라면 행동이 왼쪽이든, 오른쪽이든 봉은 넘어지고, 그에따라 보상의 합계도 매우 적어진다
+# 다시 말해, Q함수가 갖는 정보를 상태 s만으로 결정되는 부분과 행동에 따라 결정되는 부분으로 나누어볼수있음
+# Dueling Networks는 바로 이 점에 착안해서 Q함수를 상태 s만으로 결정되는 부분 V(s)와 행동에 따라 결정되는 Advantage인 A(s,a)로 나눠서 학습한
+# 다음 마지막 출력층에서 V(s)와 A(s,a)를 더해 Q(s,a)를 계산한다.
+# DQN과 비교했을 때의 이점은 V(s)로 이어지는 결합 가중치를 행동 a와 상관없이 매 단계마다 학습할 수 있다는 점이다
+# 그 덕분에 DQN에 비해 적은 수의 에피소드만으로도 학습을 마칠 수 있다. 이점은 선택 가능한 행동의 가짓수가 늘어날 수록 큰 이점이 된다.
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +21,6 @@ def display_frames_as_gif(frames):
     """
     Displays a list of frames as a gif , with controls
     """
-
     plt.figure(figsize=(frames[0].shape[1]/72.0, frames[0].shape[0]/72.0), dpi=72)
     patch = plt.imshow(frames[0])
     plt.axis('off')
@@ -82,7 +80,7 @@ import torch
 from torch import nn
 from torch import optim
 import torch.nn.functional as F
-#torch.random.manual_seed(777)
+
 BATCH_SIZE = 32
 CAPACITY = 10000
 
@@ -91,12 +89,34 @@ class Net(nn.Module):
         super(Net,self).__init__()# 부모클래스 nn.Module의 __init__을 호출함
         self.fc1 = nn.Linear(n_in, n_mid)
         self.fc2 = nn.Linear(n_mid,n_mid)
-        self.fc3 = nn.Linear(n_mid,n_out)
+        # Dueling Network
+        self.fc3_adv = nn.Linear(n_mid,n_out) # Advantage 함수 쪽 신경망 --> 출력 수는 선택 가능한 행동의 가짓수 n_out과 같음
+        self.fc3_v = nn.Linear(n_mid,1) # 가치 V쪽 신경망 --> 상태가치를 나타내므로 출력수는 1임
     
     def forward(self, x):
         h1 = F.relu(self.fc1(x))
         h2 = F.relu(self.fc2(h1))
-        output = self.fc3(h2)
+
+        adv = self.fc3_adv(h2) # 이출력은 ReLU를 거치지 않음, 출력 크기 32 * 2
+        val = self.fc3_v(h2).expand(-1,adv.size(1)) # 이 출력은 ReLU를 거치지 않음, self.fc3_v(h2)의 크기는 32 * 1임 하지만
+        # val은 adv와 덧셈을 하기 위해 expand 메서드로 크기를 [minibatch * 1]에서 [minibatch * 2]로 변환
+        #                                                       ex. [[1],[2],[3]] ==> [[1,1],[2,2],[3,3]]
+        # adv.size(1)은 2(출력할 행동의 가짓수)
+
+        output = val + adv - adv.mean(1, keepdim=True).expand(-1,adv.size(1))
+        # val + adv에서 adv의 평균을 뺀다, val의 크기는 32 * 1인데, 늘려서 32 *2 임
+                                        #  adv는 출력 그대로 32 * 2임
+                                        # 여기서 adv.mean을 빼주는 이유는 adv(s,오른쪽)에 해당하는 바이어스가 b0라 했을 때,
+                                        # 이 상태에서 덧셈으로 Q(s,오른쪽)을 제대로 계산하려면 바이어스 b0를 상쇄시키기 위해 V(s)에 바이어스 -b0를 적용해야함
+                                        # 다시말해 V(s)와 adv(s,오른쪽)에서 바이어스를 상쇄시킬수 있으므로 어떤 바이어스값이 적용됐더라도 학습이 잘되는 것임
+                                        # 한편 왼쪽에 해당하는 바이어스가 b1이라 할때 v(s)부분에 -b1을 적용해야함. 다른말로하면 행동의 종류에 따라 서로 다른 바이어스
+                                        # -b0와 -b1이 V(s)에 적용되는 것이다 --> 학습이 불안정해지는 원인임
+                                        # 이런 상황을 가능한 한 방지하기 위해 출력값에서 행동의 평균값을 빼는 것임
+                                        # 평균값을 빼면 예를 들어 이행동이 오른쪽이라면 다음식과 같이 나타날수있다 ---> 뭔말인지 모르겠음 ........ㅠㅠ
+                                        # Q(s,오른쪽) = V(S) + Adv(s,오른쪽) -(Adv(s,오른쪽) + Adv(s, 왼쪽))/2
+        # adv.mean(1,keepdim=True)로 열방향(행동의 종류 방향) 평균을 구함, 크기는 [minibatch * 1]이 됨
+        # expand 메서드로 크기를 [minibatch * 2]로 늘림
+        # ** adv.mean을 출력에서 빼야한다는 것 : 
         return output
 
 # 에이전트의 두뇌 역할을 하는 클래스, DDQN을 실제 수행함
