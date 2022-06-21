@@ -1,7 +1,8 @@
 # 클라이언트
 import socket
 
-server_ip = 'localhost' # 위에서 설정한 서버 ip
+#server_ip = 'localhost' # 위에서 설정한 서버 ip
+#server_ip = '118.235.3.203'
 server_port = 3333 # 위에서 설정한 서버 포트번호
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

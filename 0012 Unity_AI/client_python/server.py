@@ -1,7 +1,13 @@
 #서버
 import socket, time
-
-host = 'localhost' 
+#외부(client)에서 내 컴퓨터(내부,server,공유기 환경)로 접속하려할때
+# : 1. 우선 공유기를 내부ip, 포트번호 설정하여 포트포워딩 해준다
+#   2. 내부 프로그램의 host는 공유기 외부 ip 말고, 컴퓨터의 192~ 와 같은 내부 ip 설정해준다
+#       잘 모르겠으면, ipconfig(window), 네트워크 환경(mac) 가서 확인한다.
+#   3. 외부에서 server ip는 공유기 ip 설정하고 포트번호는 포트포워딩 한 번호를 넣어준다
+#   4. 연결하면된다
+#host = 'localhost' 
+host = '192.168.200.179'
 port = 3333 
 
 # 서버소켓 오픈
