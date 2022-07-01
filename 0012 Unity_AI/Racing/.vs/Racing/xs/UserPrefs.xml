@@ -1,0 +1,30 @@
+﻿<Properties StartupConfiguration="{B32525F9-3CED-DCA1-8D86-05047E283309}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/SphereController.cs">
+    <Files>
+      <File FileName="Assets/Scripts/SphereController.cs" Line="70" Column="72" />
+      <File FileName="Assets/Server.cs" Line="134" Column="68" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Racing" expanded="True" selected="True" />
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="Unity" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="f3971766-90ca-4ab0-8394-f9f5aa7b340f" />
+</Properties>

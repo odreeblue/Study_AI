@@ -13,7 +13,7 @@ public delegate void CallbackDirection(int direction);
 public delegate void CallbackGaze(int x, int y);
 public delegate void CallbackVoice(string message);
 public delegate void CallbackHandSkeleton(int x, int y);
-    
+
 public class Server : MonoBehaviour
 {
     #region private members
@@ -140,7 +140,11 @@ public class Server : MonoBehaviour
                             int lengthTypeOfService = stream.Read(bytesTypeOfService, 0, 4);
                             int lengthDisplayId = stream.Read(bytesDisplayId, 0, 4);
                             int lengthPayloadLength = stream.Read(bytesPayloadLength, 0, 4);
-
+                            Debug.Log("lengthTypeOfService : "+lengthTypeOfService);
+                            Debug.Log("Array.Reverse(lengthTypeOfService)"+Array.Reverse(bytesTypeOfService));
+                            Debug.Log("lengthDisplayId : "+lengthDisplayId);
+                            Debug.Log("lengthPayloadLength : "+lengthPayloadLength);
+                            
                             if (lengthTypeOfService <= 0 && lengthDisplayId <= 0 && lengthPayloadLength <= 0)
                             {
                                 break;

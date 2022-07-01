@@ -1114,7 +1114,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -13
   m_TargetDisplay: 0
 --- !u!224 &1267271448
 RectTransform:
@@ -1148,6 +1148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb9f5e93111174639be5f538ed21ef0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  subbox: {fileID: 0}
-  subintext: {fileID: 0}
-  subani: {fileID: 0}
+  subbox: {fileID: 1073654128}
+  subintext: {fileID: 1259425852}
+  subani: {fileID: 557889948}
