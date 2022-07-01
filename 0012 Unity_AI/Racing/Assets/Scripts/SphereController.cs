@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 
 
+
 public class SphereController : MonoBehaviour
 {
     public float speed = 4f;
@@ -23,7 +24,8 @@ public class SphereController : MonoBehaviour
         action_flag = true;
         collision_flag = false;
         current_direction = 0;
-
+        Debug.Log("초기 x 위치는 : " + SphereRigidbody.position.x);
+        Debug.Log("초기 z 위치는 : " + SphereRigidbody.position.z);
 
         //Server.Instance.SetTouchCallback(new CallbackTouch(OnTouch));
         Server.Instance.SetDirectionCallback(new CallbackDirection(OnDirection)); //static Server 반환됨
@@ -38,12 +40,32 @@ public class SphereController : MonoBehaviour
         //    Debug.Log("OnCollisionEnter");
         //}
         //Debug.Log("X: " + SphereRigidbody.position.x.ToString() + " Y: " + SphereRigidbody.position.y.ToString() + " Z: " + SphereRigidbody.position.z.ToString());
-        collision_flag = true;
-        Debug.Log(col.gameObject.name);
-        Debug.Log("충돌진입");
+
+        string c = "";
+        foreach (char str in col.gameObject.name)
+        {
+            c += str;
+            if (c.Length == 3)//c가 3개가 되었을 때 확인하자
+            {
+                if (c == "Out" || c =="Ins")
+                {
+                    collision_flag = true;
+                    Debug.Log(col.gameObject.name);
+                }
+
+                break;
+            }
+        }
+
+
+
+        //collision_flag = true;
+        //Debug.Log(col.gameObject.name);
+        //Debug.Log("충돌진입");
     }
     private void OnCollisionStay(Collision col)
     {
+        
         //collision_flag = true;
         //Debug.Log("충돌중");
     }
@@ -58,27 +80,39 @@ public class SphereController : MonoBehaviour
     {
         if (action_flag == false) // 신호가 들어왔으면
         {
+            Debug.Log("input direction command !!!!!!");
             switch (current_direction)
             {
                 case 0://위쪽 방향 -z방향
-                    transform.Translate(new Vector3(0, 0, -1) * speed);
+                    SphereRigidbody.transform.Translate(new Vector3(0, 0, -1) * speed);
+                    //transform.Translate(new Vector3(0, 0, -1) * speed);
                     break;
                 case 1://아래쪽 방향 z방향
-                    transform.Translate(new Vector3(0, 0, 1) * speed);
+                    SphereRigidbody.transform.Translate(new Vector3(0, 0, 1) * speed);
+                    //transform.Translate(new Vector3(0, 0, 1) * speed);
                     break;
                 case 2: //오른쪽 방향 -x 방향
-                    transform.Translate(new Vector3(-1, 0, 0) * speed);
+                    SphereRigidbody.transform.Translate(new Vector3(-1, 0, 0) * speed);
+                    //transform.Translate(new Vector3(-1, 0, 0) * speed);
                     break;
                 case 3: // 왼쪽 방향 x 방향
-                    transform.Translate(new Vector3(1, 0, 0) * speed);
+                    SphereRigidbody.transform.Translate(new Vector3(1, 0, 0) * speed);
+                    //transform.Translate(new Vector3(1, 0, 0) * speed);
                     break;
             }
+            //Debug.Log("trans - 바뀐 위치 x: "+ transform.position.x);
+            //Debug.Log("trans - 바뀐 위치 z: " + transform.position.z);
+            //Debug.Log("rigid - 바뀐 위치 x : " + SphereRigidbody.position.x);
+            //Debug.Log("rigid - 바뀐 위치 z : " + SphereRigidbody.position.z);
+
             //Server.Instance.m_SendPacket.position_x = SphereRigidbody.position.x;
             //Server.Instance.m_SendPacket.position_z = SphereRigidbody.position.z;
             //Server.Instance.m_SendPacket.collision_flag = collision_flag;
-            Server.Instance.position_x = SphereRigidbody.position.x;
-            Server.Instance.position_z = SphereRigidbody.position.z;
-            if (collision_flag == true)
+            //Server.Instance.position_x = SphereRigidbody.position.x; // Rigidbody는 다음 프레임에 변한 위치가 반영됨
+            //Server.Instance.position_z = SphereRigidbody.position.z; //
+            Server.Instance.position_x = transform.position.x; //따라서 transform.position.x Server의 position정보 변겨
+            Server.Instance.position_z = transform.position.z;
+            if (collision_flag == true)//수정필요..
             {
                 Server.Instance.is_collision = 1;
             }
@@ -86,6 +120,8 @@ public class SphereController : MonoBehaviour
             {
                 Server.Instance.is_collision = 0;
             }
+            Server.Instance.change_position = true;
+
         }
         
         

@@ -23,6 +23,8 @@ public class Server : MonoBehaviour
     public float position_x = 0f;
     public float position_z = 0f;
     public int is_collision = 0;
+
+    public bool change_position = false;
     public static Server instance = null;
     CallbackDirection callbackDirection; // delegate(대리자)
 
@@ -83,7 +85,8 @@ public class Server : MonoBehaviour
         try
         {
             // Create listener on 192.168.200.179 port 50001
-            tcpListener = new TcpListener(IPAddress.Parse("192.168.200.108"),50001);
+            //tcpListener = new TcpListener(IPAddress.Parse("192.168.200.108"),50001);
+            tcpListener = new TcpListener(IPAddress.Parse("172.20.10.10"), 50001);//iphone연결
             tcpListener.Start();
             Debug.Log("Server is listening");
             while(true)
@@ -130,9 +133,31 @@ public class Server : MonoBehaviour
                             int direction = BitConverter.ToInt32(bytes, 0);//byte -> int 로 변환 
                             callbackDirection(direction);// 받은 action signal --> sphere 전달
 
-                            datapacket.position_x = this.position_x;
-                            datapacket.position_z = this.position_z;
-                            datapacket.is_collision = this.is_collision;
+                            //datapacket.position_x = this.position_x;
+                            //datapacket.position_z = this.position_z;
+                            //datapacket.is_collision = this.is_collision;
+                            
+                            while (true) 
+                            {
+                                //Debug.Log("change_position : " + change_position);
+                                if (change_position == true)
+                                {
+                                    //Debug.Log("position 바꼈따 ");
+                                    //Debug.Log("position x "+ this.position_x);
+                                    //Debug.Log("position z " + this.position_z);
+
+                                    datapacket.position_x = this.position_x;
+                                    datapacket.position_z = this.position_z;
+                                    datapacket.is_collision = this.is_collision;
+                                    change_position = false; // 돌려놓기
+                                    break; 
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+
+                            }
 
                             byte[] buffer = new byte[Marshal.SizeOf(datapacket)];
                             unsafe

@@ -24,7 +24,8 @@ import time
 # pynput 을 사용하려면 맥OS의 "보안 및 개인 정보 보호"->"손쉬운사용" -> "터미널.app"체크("시스템/응용프로그램/유틸리티/터미널.app")
                                                                     #-> "visual studio code" 체크
 #server_ip = '192.168.200.179' # 위에서 설정한 서버 ip
-server_ip = '192.168.200.108'
+#server_ip = '192.168.200.108'
+server_ip = '172.20.10.10'
 #server_ip = '118.235.3.203'
 server_port = 50001 # 위에서 설정한 서버 포트번호
 
