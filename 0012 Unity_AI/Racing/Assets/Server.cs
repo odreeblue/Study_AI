@@ -7,69 +7,43 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Runtime.InteropServices;
-public delegate void CallbackDirection(int direction);// delegate 선언
 
+public delegate void CallbackDirection(int direction, int done);// delegate 선언
 public class Server : MonoBehaviour
 {
     #region private members
-    private TcpListener tcpListener;
+    private TcpListener tcpListener_server;
+    //private TcpClient tcpClient_Client;
+
     private Thread tcpListenerThread;
-    private TcpClient connectedTcpClient;
+    
     #endregion
     public DataPacket datapacket;
-    //public SphereController sphere = null;
-    //public float Position_X, Position_Z;
-    //public bool Collisition_flag;
-    public float position_x = 0f;
-    public float position_z = 0f;
-    public int is_collision = 0;
-
-    public bool change_position = false;
+    
+    //public float position_x = 0f;
+    //public float position_z = 0f;
+    //public float is_collision = 0f;
+    public List<float> SendData = null;
+    //public bool change_position = false;
     public static Server instance = null;
     CallbackDirection callbackDirection; // delegate(대리자)
-
-    private void Awake() // 게임이 시작되기전, 모든 변수와 게임의 상태를 초기화하기 위해서 호출
-                         // Start()보다 먼저 호출됨, MonoBehaviour.Awake()
-    {
-        Debug.Log("Start Server");
-        instance = this; // this = Server
-        //m_SendPacket.position_x = 0.0f;
-        //m_SendPacket.position_z= 0.0f;
-        //m_SendPacket.collision_flag = false;
-        // Start TcpServer background thread
-        //sphere = SphereController.Instance;
-        datapacket = new DataPacket();
-        //sphere = SphereController.Instance;
-        tcpListenerThread = new Thread(new ThreadStart(ListenForIncommingRequest));
-        tcpListenerThread.IsBackground = true;
-        tcpListenerThread.Start();
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public static Server Instance
     {
         get
         {
-            if(instance == null)
+            if (instance == null)
             {
                 return null;
             }
             return instance;
         }
     }
-    
+
     public void SetDirectionCallback(CallbackDirection callback)// 매개변수 delegate 타입
     {
+
+        // callbackDirection += new CallbackDirection(OnDirection) 
         if (callbackDirection == null)
         {
             callbackDirection = callback;
@@ -79,151 +53,88 @@ public class Server : MonoBehaviour
             callbackDirection += callback;
         }
     }
-
+    private void Awake() // 게임이 시작되기전, 모든 변수와 게임의 상태를 초기화하기 위해서 호출
+                         // Start()보다 먼저 호출됨, MonoBehaviour.Awake()
+    {
+        Debug.Log("Start Server");
+        instance = this; // this = Server
+        datapacket = new DataPacket();
+        
+        tcpListenerThread = new Thread(new ThreadStart(ListenForIncommingRequest));
+        tcpListenerThread.IsBackground = true;
+        tcpListenerThread.Start();
+    }
+    
     private void ListenForIncommingRequest()
     {
+
         try
         {
-            // Create listener on 192.168.200.179 port 50001
-            //tcpListener = new TcpListener(IPAddress.Parse("192.168.200.108"),50001);
-            tcpListener = new TcpListener(IPAddress.Parse("172.20.10.10"), 50001);//iphone연결
-            tcpListener.Start();
+            tcpListener_server = new TcpListener(IPAddress.Parse("127.0.0.1"), 50001);
+            tcpListener_server.Start();
             Debug.Log("Server is listening");
-            while(true)
+            while (true)
             {
-                using(connectedTcpClient = tcpListener.AcceptTcpClient())// 문장형태의 using문, IDisposable 객체의 올바른 사용을 보장하는 편리한 구문 제공
-                                                                         // 관리되지 않는 리소스에 액세스하는 대표적인 클래스들, 사용한 후에 적절한 시기에 해제(Dispose)하여 
-                                                                         // 해당 리소스를 반납, using 문을 벗어나면 자동으로 해제함
-                {
-                    using(NetworkStream stream = connectedTcpClient.GetStream()) // Client로 Stream받기
-                    {
-                        do
-                        {
-                            //Byte[] bytesTypeOfService = new Byte[4];
-                            //Byte[] bytesDisplayId = new Byte[4];
-                            //Byte[] bytesPayloadLength = new Byte[4];
-                            
-                            //int lengthTypeOfService = stream.Read(bytesTypeOfService, 0, 4);
-                            //int lengthDisplayId= stream.Read(bytesDisplayId,0,4);
-                            //int lengthPayloadLength = stream.Read(bytesPayloadLength,0,4);
-                            
-                            //if (lengthTypeOfService <= 0 && lengthDisplayId <= 0 && lengthPayloadLength <=0 )
-                            //{
-                            //    break;
-                            //}
-                            
-                            //if (!BitConverter.IsLittleEndian)//System.BitConverter, 기본-> Byte의 배열로, 바이트 배열을 기본 데이터형식으로 변환
-                            //                                 // IsLittleEndian : 이 컴퓨터 아키텍처에서 데이터가 저장되는 바이트 순서를 나타냄
-                            //{
-                            //    Array.Reverse(bytesTypeOfService);
-                            //    Array.Reverse(bytesDisplayId);
-                            //    Array.Reverse(bytesPayloadLength);
-                            //}
-                            //int typeOfService = BitConverter.ToInt32(bytesTypeOfService,0);
-                            //int displayId = BitConverter.ToInt32(bytesDisplayId,0);
-                            //int payloadLength = BitConverter.ToInt32(bytesPayloadLength,0);
-                            
-                            //if (typeOfService == 3)
-                            //{
-                            //    payloadLength = 1012;
-                            //}
-                            Byte[] bytes = new Byte[4];
-                            //int length = stream.Read(bytes,0,payloadLength);
-                            stream.Read(bytes, 0, 4);//데이터 읽
-                            int direction = BitConverter.ToInt32(bytes, 0);//byte -> int 로 변환 
-                            callbackDirection(direction);// 받은 action signal --> sphere 전달
-
-                            //datapacket.position_x = this.position_x;
-                            //datapacket.position_z = this.position_z;
-                            //datapacket.is_collision = this.is_collision;
-                            
-                            while (true) 
-                            {
-                                //Debug.Log("change_position : " + change_position);
-                                if (change_position == true)
-                                {
-                                    //Debug.Log("position 바꼈따 ");
-                                    //Debug.Log("position x "+ this.position_x);
-                                    //Debug.Log("position z " + this.position_z);
-
-                                    datapacket.position_x = this.position_x;
-                                    datapacket.position_z = this.position_z;
-                                    datapacket.is_collision = this.is_collision;
-                                    change_position = false; // 돌려놓기
-                                    break; 
-                                }
-                                else
-                                {
-                                    continue;
-                                }
-
-                            }
-
-                            byte[] buffer = new byte[Marshal.SizeOf(datapacket)];
-                            unsafe
-                            {
-                                fixed (byte* fixed_buffer = buffer)
-                                {
-                                    Marshal.StructureToPtr(datapacket, (IntPtr)fixed_buffer, false);
-                                }
-                            }
-
-                            stream.Write(buffer, 0, Marshal.SizeOf(datapacket));
-                            Debug.Log("보낸 데이터 크기는 : "+Marshal.SizeOf(datapacket));
-                            stream.Flush();
-                            //HandleIncommingRequest(typeOfService,displayId,payloadLength,bytes); // param : 1,0,4, byte[4]
-                            //HandleIncommingRequest(bytes);
-                            //DirectionHandler(bytes);
-                            //datapacket.m_StringlVariable = "datagood";
-                            //byte[] sendPacket = StructToByteArray(m_SendPacket);
-                            //Debug.Log(sendPacket.Length);
-                            //connectedTcpClient.Client.Send(sendPacket, 0, sendPacket.Length, SocketFlags.None);
-                            //Debug.Log("데이터 전송 완/");
-                            //connectedTcpClient.Send
-                        } while(true);
-                    }
-                }
+                TcpClient tcpClient_Client = tcpListener_server.AcceptTcpClient();
+                Thread tcpClient_Action = new Thread(new ParameterizedThreadStart(Action_Client));
+                tcpClient_Action.Start(tcpClient_Client);
             }
         }
         catch (SocketException socketException)
         {
-
+            //tcpListener_server.
             Debug.Log("SocketException " + socketException.ToString());
         }
     }
-    //byte[] StructToByteArray(object obj)
-    //{
-    //    int size = Marshal.SizeOf(obj);
-    //    byte[] arr = new byte[size];
-    //    IntPtr ptr = Marshal.AllocHGlobal(size);
+    private void Action_Client(object tcpClient)
+    {
+        TcpClient client = tcpClient as TcpClient;
+        using (NetworkStream stream = client.GetStream()) // Client로 Stream받기
+        {
+            do
+            {
+                Byte[] direction_bytes = new Byte[4];
+                Byte[] isdone = new byte[4];
+                stream.Read(direction_bytes, 0, 4);//데이터 읽기
+                stream.Read(isdone, 0, 4);
+                int direction = BitConverter.ToInt32(direction_bytes, 0);//byte -> int 로 변환
+                int done = BitConverter.ToInt32(isdone, 0);
+                callbackDirection(direction,done);// 받은 action signal --> sphere 전달
+                                             // Sphere의 OnDirection 호출
+                while (true)
+                {
 
-    //    Marshal.StructureToPtr(obj, ptr, true);
-    //    Marshal.Copy(ptr, arr, 0, size);
-    //    Marshal.FreeHGlobal(ptr);
-    //    return arr;
-    //}
-    // Handle incomming request
-    //private void HandleIncommingRequest(int typeOfService, int displayId, int payloadLength, byte[] bytes)
-    //private void HandleIncommingRequest(byte[] bytes)
-    //{
-    //    Debug.Log("=========================================");
-    //    Debug.Log("Type of Service : " + typeOfService);
-    //    Debug.Log("Display Id      : " + displayId);
-    //    Debug.Log("Payload Length  : " + payloadLength);
-    //    //DirectionHandler(displayId, payloadLength, bytes);
-    //    DirectionHandler(bytes);
-    //}
-    // Handle Direction Signal
-    //private void DirectionHandler(byte[] bytes)
-    //{
-    //    Debug.Log("Execute Direction Handler");
-    //    int direction = BitConverter.ToInt32(bytes, 0);
-    //    Debug.Log("Direction  : " + direction);
-    //    if(callbackDirection != null)
-    //    {
-    //        callbackDirection(direction);
-    //    }
-    //}
+                    if (SendData.Count == 3) // Sphere로부터 데이터가 다 입력 됐으면
+                    {
+                        datapacket.position_x = SendData[0];
+                        datapacket.position_z = SendData[1];
+                        datapacket.is_collision = SendData[2];
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                }
+                SendData.Clear();
+                byte[] buffer = new byte[Marshal.SizeOf(datapacket)];
+                unsafe
+                {
+                    fixed (byte* fixed_buffer = buffer)
+                    {
+                        Marshal.StructureToPtr(datapacket, (IntPtr)fixed_buffer, false);
+                    }
+                }
+
+                stream.Write(buffer, 0, Marshal.SizeOf(datapacket));
+                Debug.Log("보낸 데이터 크기는 : " + Marshal.SizeOf(datapacket));
+                stream.Flush();
+
+            } while (true);
+        }
+    }
+    
 }
 
 
