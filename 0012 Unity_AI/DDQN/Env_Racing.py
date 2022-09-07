@@ -8,7 +8,7 @@ import time
 class Env():
     def __init__(self):
         '''게임 환경 실행'''
-        os.system("open -a MiroGame.app")
+        #os.system("Racing.exe")
         time.sleep(5)
         self.server_ip = '127.0.0.1'
         self.server_port = 50001
@@ -21,5 +21,6 @@ class Env():
         senddata = struct.pack('ii',direction,done)
         self.socket.sendall(senddata)
         recvdata = self.socket.recv(12)
+        #time.sleep(0.2)
         recvdata = struct.unpack('fff', recvdata)
         return recvdata 

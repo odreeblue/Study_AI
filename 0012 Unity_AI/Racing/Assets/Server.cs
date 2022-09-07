@@ -24,6 +24,8 @@ public class Server : MonoBehaviour
     //public float position_z = 0f;
     //public float is_collision = 0f;
     public List<float> SendData = null;
+    //public byte[] imagedata = null;
+    public string imagedata = null;
     //public bool change_position = false;
     public static Server instance = null;
     CallbackDirection callbackDirection; // delegate(대리자)
@@ -93,43 +95,50 @@ public class Server : MonoBehaviour
         {
             do
             {
-                Byte[] direction_bytes = new Byte[4];
-                Byte[] isdone = new byte[4];
-                stream.Read(direction_bytes, 0, 4);//데이터 읽기
-                stream.Read(isdone, 0, 4);
-                int direction = BitConverter.ToInt32(direction_bytes, 0);//byte -> int 로 변환
-                int done = BitConverter.ToInt32(isdone, 0);
-                callbackDirection(direction,done);// 받은 action signal --> sphere 전달
-                                             // Sphere의 OnDirection 호출
-                while (true)
+                if (stream.CanRead)
                 {
-
-                    if (SendData.Count == 3) // Sphere로부터 데이터가 다 입력 됐으면
+                    Byte[] direction_bytes = new Byte[4];
+                    Byte[] isdone = new byte[4];
+                    stream.Read(direction_bytes, 0, 4);//데이터 읽기
+                    stream.Read(isdone, 0, 4);
+                    int direction = BitConverter.ToInt32(direction_bytes, 0);//byte -> int 로 변환
+                    int done = BitConverter.ToInt32(isdone, 0);
+                    callbackDirection(direction, done);// 받은 action signal --> sphere 전달
+                                                       // Sphere의 OnDirection 호출
+                    while (true)
                     {
-                        datapacket.position_x = SendData[0];
-                        datapacket.position_z = SendData[1];
-                        datapacket.is_collision = SendData[2];
-                        break;
+
+                        if (SendData.Count == 4 && imagedata != null) // Sphere로부터 데이터가 다 입력 됐으면
+                        {
+                            datapacket.position_x = SendData[0];
+                            datapacket.position_z = SendData[1];
+                            datapacket.is_collision = SendData[2];
+                            datapacket.image_size = SendData[3];
+                            datapacket.image = imagedata;
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
                     }
-                    else
+                    SendData.Clear();
+                    imagedata = null;
+                    byte[] buffer = new byte[Marshal.SizeOf(datapacket)];
+                    unsafe
                     {
-                        continue;
+                        fixed (byte* fixed_buffer = buffer)
+                        {
+                            Marshal.StructureToPtr(datapacket, (IntPtr)fixed_buffer, false);
+                        }
                     }
 
+                    stream.Write(buffer, 0, Marshal.SizeOf(datapacket));
+                    Debug.Log("보낸 데이터 크기는 : " + Marshal.SizeOf(datapacket));
+                    stream.Flush();
                 }
-                SendData.Clear();
-                byte[] buffer = new byte[Marshal.SizeOf(datapacket)];
-                unsafe
-                {
-                    fixed (byte* fixed_buffer = buffer)
-                    {
-                        Marshal.StructureToPtr(datapacket, (IntPtr)fixed_buffer, false);
-                    }
-                }
-
-                stream.Write(buffer, 0, Marshal.SizeOf(datapacket));
-                Debug.Log("보낸 데이터 크기는 : " + Marshal.SizeOf(datapacket));
-                stream.Flush();
+                
 
             } while (true);
         }

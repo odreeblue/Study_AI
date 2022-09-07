@@ -4,6 +4,9 @@ import torch
 from Env_Racing import Env
 import time
 import math
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+
 class Environment:
         def __init__(self,gamma, max_steps, num_episodes, num_states, num_actions):
                 self.gamma = gamma
@@ -50,7 +53,7 @@ class Environment:
                                 if step!=self.max_steps-1: # max_steps에 다다르지 못했을 때
                                         observation_next = self.env.step(action.item(),0)
                                         if observation_next[2]==0: # 충돌없을 때
-                                                reward = torch.FloatTensor([-0.1])
+                                                reward = torch.FloatTensor([0.0])
                                                 state_next = np.array([observation_next[0],observation_next[1]])
                                                 state_next = torch.from_numpy(state_next).type(torch.FloatTensor)
                                                 state_next = torch.unsqueeze(state_next,0)
@@ -59,14 +62,30 @@ class Environment:
                                                 state = state_next
                                         elif observation_next[2]==1: # 충돌있을 때 
                                                 reward = torch.FloatTensor([-1.0])
-                                                state_next = np.array([observation_next[0],observation_next[1]])
-                                                state_next = torch.from_numpy(state_next).type(torch.FloatTensor)
-                                                state_next = torch.unsqueeze(state_next,0)
+                                                #state_next = np.array([observation_next[0],observation_next[1]])
+                                                #state_next = torch.from_numpy(state_next).type(torch.FloatTensor)
+                                                #state_next = torch.unsqueeze(state_next,0)
+                                                state_next = None # 충돌하면 다음 행동은 없다
                                                 self.agent.memorize(state,action,state_next, reward)
                                                 self.agent.update_q_function()
                                                 state = state_next
-                                        elif observation_next[2]==2: # 목표 지점에 도착했을 시
-                                                reward = torch.FloatTensor([5.0])
+                                                break
+                                        elif observation_next[2]==10: # 보너스를 먹으면
+                                                reward = torch.FloatTensor([10.0])
+                                                state_next = np.array([observation_next[0],observation_next[1]])
+                                                state_next = torch.from_numpy(state_next).type(torch.FloatTensor)
+                                                state_next = torch.unsqueeze(state_next,0)
+                                                #state_next = None # 목표지점에 도착했으니 다음 행동은 없다
+                                                self.agent.memorize(state,action,state_next, reward)
+                                                self.agent.update_q_function()
+                                                #complete_episodes +=1
+                                                #print('%d Episode, %d steps에 목표 지점 도착 ! 현재까지 목표지점 도착한 횟수: %d' % (episode,step, complete_episodes))
+                                                #break
+                                        elif observation_next[2]==15: # 보너스를 먹으면
+                                                reward = torch.FloatTensor([20.0])
+                                                #state_next = np.array([observation_next[0],observation_next[1]])
+                                                #state_next = torch.from_numpy(state_next).type(torch.FloatTensor)
+                                                #state_next = torch.unsqueeze(state_next,0)
                                                 state_next = None # 목표지점에 도착했으니 다음 행동은 없다
                                                 self.agent.memorize(state,action,state_next, reward)
                                                 self.agent.update_q_function()
@@ -76,9 +95,9 @@ class Environment:
 
                                 elif step == self.max_steps-1: # max_steps에 다다랐을때
                                         observation_next = self.env.step(action.item(),1)
-                                        last_position_distance = math.sqrt(math.pow(goal_x-state[0,0].item(),2)+math.pow(goal_z-state[0,1].item(),2))
-                                        reward = (initial_position_distance - last_position_distance)/50
-                                        reward = torch.FloatTensor([reward])
+                                        #last_position_distance = math.sqrt(math.pow(goal_x-state[0,0].item(),2)+math.pow(goal_z-state[0,1].item(),2))
+                                        #reward = (initial_position_distance - last_position_distance)/50
+                                        reward = torch.FloatTensor([-0.1])
                                         state_next = None
                                         self.agent.memorize(state,action,state_next,reward)
                                         self.agent.update_q_function()

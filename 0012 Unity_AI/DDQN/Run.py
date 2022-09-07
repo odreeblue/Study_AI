@@ -13,7 +13,7 @@ from Environment import Environment
 # 3. 상수 정의
 GAMMA  = 0.99 # 시간 할인율
 MAX_STEPS =200 #  1에피소드 당 최대 단계 수
-NUM_EPISODES = 3000 # 최대 에피소드 수
+NUM_EPISODES = 10000 # 최대 에피소드 수
 NUM_STATES = 2 # 태스크의 상태 변수 개수 : x position, z position
 NUM_ACTIONS = 4 # 태스크의 행동 가짓 수 : 위, 아래, 오른쪽, 왼쪽
 # 실행 엔트리 포인트

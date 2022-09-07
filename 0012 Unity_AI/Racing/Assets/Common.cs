@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -38,7 +39,7 @@ public class Common : MonoBehaviour
         GUI.Label(rect, text, style);
     }
 }
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Sequential,CharSet =CharSet.Ansi)]
 public class DataPacket
 {
     [MarshalAs(UnmanagedType.R4)]
@@ -47,4 +48,11 @@ public class DataPacket
     public float position_z;
     [MarshalAs(UnmanagedType.R4)]
     public float is_collision;
+    [MarshalAs(UnmanagedType.R4)]
+    public float image_size;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 51000)]
+    //[MarshalAs(UnmanagedType.ByValArray)] --> 이거 안됌 전달 사이즈가 20밖에 안됌
+    //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 32000)]
+    //public byte[] image;
+    public string image;
 }
