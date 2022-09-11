@@ -16,6 +16,8 @@ class Environment:
                 self.num_actions = num_actions # 태스크의 행동 가짓수(위, 아래 ,오른쪽, 왼쪽)를 받아옴
                 self.agent = Agent(num_states, num_actions, gamma) # 에이전트 역할을 할 객체를 생성
                 self.env = Env() # 
+
+        
         def run(self):
                 '''실행'''
                 self.env.connect()# 게임과 tcp/ip 연결
@@ -28,7 +30,7 @@ class Environment:
                 complete_episodes = 0 #현재까지 목표지점에 도착한 에피소드
                 #episode_final = False # 마지막 에피소드 여부
                 #frames = [] # 애니메이션을 만들기 위해 마지막 에피소드의 프레임을 저장할 배열
-
+        
                 for episode in range(self.num_epsidoes): #최대 에피소드 수만큼 반복
                         #observation = self.env.reset() # 환경 초기화
                         #state = observation

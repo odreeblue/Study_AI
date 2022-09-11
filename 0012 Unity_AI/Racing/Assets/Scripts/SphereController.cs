@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.Net.Sockets;
 using UnityEngine.SceneManagement;
-using UnityEditor.TextCore.Text;
+//using UnityEditor.TextCore.Text;
 using UnityEngine.XR;
 //using System.Drawing;
 

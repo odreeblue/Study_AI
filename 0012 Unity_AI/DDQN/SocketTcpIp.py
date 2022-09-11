@@ -6,9 +6,9 @@ import time
 import io
 from PIL import Image
 import binascii
-import cv2
+#import cv2
 import numpy as np
-import simplejpeg
+#import simplejpeg
 from io import StringIO
 from io import BytesIO
 import base64

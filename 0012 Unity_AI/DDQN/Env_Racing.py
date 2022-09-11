@@ -18,9 +18,26 @@ class Env():
         self.socket.connect((self.server_ip, self.server_port))
 
     def step(self, direction,done):
-        senddata = struct.pack('ii',direction,done)
-        self.socket.sendall(senddata)
-        recvdata = self.socket.recv(12)
+        # 진행 방향 명령(direction), 게임이 끝났는지 여부(done) 
+        senddata = struct.pack('ii',direction,done) # 바이너리 데이터로 패킹
+        self.socket.sendall(senddata) # Unity 로 패킹한 데이터 송신
+        
+        # 데이터 수신
+        pos_x = struct.unpack('f',socket.recv(4))[0] # 공의 x 좌표
+        pos_z = struct.unpack('f',socket.recv(4))[0] # 공의 z 좌표
+        
+
+
+        
+        
+        recvdata = self.socket.recv(12) # 
         #time.sleep(0.2)
+
+
+
         recvdata = struct.unpack('fff', recvdata)
+        
+
+
+
         return recvdata 
