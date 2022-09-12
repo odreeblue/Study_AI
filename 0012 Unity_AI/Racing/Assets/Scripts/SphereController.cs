@@ -18,13 +18,14 @@ public class SphereController : MonoBehaviour
     public Vector3 SubjectPosition;
     public Vector3 SpherePosition;
     public int game_done;
-    public GameObject bonus1,bonus2,bonus3,bonus4,bonus5;
+    public GameObject bonus0,bonus1,bonus2,bonus3,bonus4,bonus5;
     public bool IsGoal;
     public float bonus;
     //public Vector3 LastSpherePosition;
     //public Vector3 reflect;
     void Start()
     {
+        bonus0 = GameObject.Find("Bonus_4.5,0");
         bonus1 = GameObject.Find("Bonus_2,0");
         bonus2 = GameObject.Find("Bonus_1,4");
         bonus3 = GameObject.Find("Bonus_0,0");
@@ -126,6 +127,7 @@ public class SphereController : MonoBehaviour
 
                     SphereRigidbody.transform.position = new Vector3(4.0f, 3.0f, -4.0f);
                     SpherePosition = new Vector3(4.0f, 0.0f, -4.0f);
+                    bonus0.transform.position = new Vector3(bonus0.transform.position.x, 0.6f, bonus0.transform.position.z);
                     bonus1.transform.position = new Vector3(bonus1.transform.position.x, 0.6f, bonus1.transform.position.z);
                     bonus2.transform.position = new Vector3(bonus2.transform.position.x, 0.6f, bonus2.transform.position.z);
                     bonus3.transform.position = new Vector3(bonus3.transform.position.x, 0.6f, bonus3.transform.position.z);
@@ -172,6 +174,7 @@ public class SphereController : MonoBehaviour
                 SphereRigidbody.transform.position = new Vector3(4.0f, 3.0f, -4.0f);
                 collision_flag = false;
                 SpherePosition = new Vector3(4.0f, 0.0f, -4.0f);
+                bonus0.transform.position = new Vector3(bonus0.transform.position.x, 0.6f, bonus0.transform.position.z);
                 bonus1.transform.position = new Vector3(bonus1.transform.position.x, 0.6f, bonus1.transform.position.z);
                 bonus2.transform.position = new Vector3(bonus2.transform.position.x, 0.6f, bonus2.transform.position.z);
                 bonus3.transform.position = new Vector3(bonus3.transform.position.x, 0.6f, bonus3.transform.position.z);

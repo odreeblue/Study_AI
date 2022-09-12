@@ -80,25 +80,41 @@ while True:
     print("image_data : "+str(len(image_data))) # 39500
 
     x = base64.b64decode(image_data)
-    filename = 'some_image.png'  # I assume you have a way of picking unique filenames
-    with open(filename, 'wb') as f:
-        f.write(x)
+    #filename = 'some_image.png'  # I assume you have a way of picking unique filenames
+    #with open(filename, 'wb') as f:
+    #    f.write(x)
 
 
 
-    tempdata = b''
-    #tempdata = ""
-    to_receive2 = 51000-int(image_size)
-    while to_receive2 > 0:
-        tempdata += socket.recv(51000-int(image_size))
-        to_receive2 = int(51000-int(image_size)) - len(tempdata)
+    #tempdata = b''
+    ##tempdata = ""
+    #to_receive2 = 51000-int(image_size)
+    #while to_receive2 > 0:
+    #    tempdata += socket.recv(51000-int(image_size))
+    #    to_receive2 = int(51000-int(image_size)) - len(tempdata)
+#
+    #image_data2 = tempdata
+    #print("image_data2 : "+str(len(image_data2)))
+    #x2 = base64.b64decode(image_data2)
+    #print(len(x2))
+    stream = BytesIO(x)
+    image = Image.open(stream).convert('L')
+    stream.close()
+    print(image.size)
 
-    image_data2 = tempdata
-    print("image_data2 : "+str(len(image_data2)))
-    x2 = base64.b64decode(image_data2)
-    print(len(x2))
-    #stream = BytesIO(x2)
-    #image = Image.open(stream).convert('RGB')
-    #stream.close()
+    img_crop = image.crop((225,0,906-25,656))
+    #img_res = image.resize((int(1115/8),int(656/8)))
+    print(img_crop.size)
+
+    img_resize = img_crop.resize((int(656/8),int(656/8)))
+    print(img_resize.size)
+    img_resize.show()
+    #img_crop.show()    
+    #img_resize = image
+    #print(img_res.size)
+    #print(type(img_res))
+    #img_res = np.asarray(img_res)
+    #print(img_res[0:10])
+    #img_res.show()
     #image.show()
 socket.close()
