@@ -45,7 +45,7 @@ from collections import namedtuple
 Transition = namedtuple('Transition',('state','action','next_state','reward'))
 
 # 3. 상수 정의
-ENV = 'CartPole-v0' # 태스크 이름
+ENV = 'CartPole-v1' # 태스크 이름
 GAMMA  = 0.99 # 시간 할인율
 MAX_STEPS =200 #  1에피소드 당 최대 단계 수
 NUM_EPISODES = 2 # 최대 에피소드 수
@@ -296,7 +296,7 @@ class Environment:
 
                                 # 행동 a_t를 실행해 다음 상태 s_t+1 과 done 플래그 값을 결정
                                 # action에 .item()을 호출해 행동 내용을 구함
-                                observation_next,_,done,_ = self.env.step(action.item()) #reward와 info는 사용하지 않음 _처리
+                                observation_next,r,done,i = self.env.step(action.item()) #reward와 info는 사용하지 않음 _처리
                                 
                                 #보상을 부여하고 episode의 종료 판정 및 state_next를 설정
                                 if done: # 단계수가 200을 넘었거나 봉이 일정각도 이상 기울면 done이 True가 됨

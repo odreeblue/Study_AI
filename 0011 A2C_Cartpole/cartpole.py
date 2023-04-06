@@ -200,7 +200,9 @@ class Environment:
         # 초기 상태로부터 시작
         obs = [envs[i].reset() for i in range(NUM_PROCESSES)]
         obs = np.array(obs)
-        obs = torch.from_numpy(obs).float()  # torch.Size([16, 4])
+        print(obs)
+        obs = torch.from_numpy(obs)  # torch.Size([16, 4])
+
         current_obs = obs  # 가장 최근의 obs를 저장
         
         # advanced 학습에 사용되는 객체 rollouts 첫번째 상태에 현재 상태를 저장

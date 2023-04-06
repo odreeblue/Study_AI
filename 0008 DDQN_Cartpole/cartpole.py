@@ -279,7 +279,9 @@ class Environment:
 
                 for episode in range(NUM_EPISODES): #최대 에피소드 수만큼 반복
                         observation = self.env.reset() # 환경 초기화
-                        state = observation # 관측을 변환없이 그대로 상태 s로 사용
+                        #print(type(observation))
+                        #print(observation[0])
+                        state = observation[0] # 관측을 변환없이 그대로 상태 s로 사용
                         state = torch.from_numpy(state).type(torch.FloatTensor) # Numpy변수를 파이토치 텐서로 변환
                         state = torch.unsqueeze(state, 0)# size 4를 size 1*4 로 변환
 
@@ -288,7 +290,7 @@ class Environment:
                                 #if episode_final is True : #마지막 에피소드에서는 각 시각의 이미지를 frames에 저장
                                 #        frames.append(self.env.render(mode='rgb_array'))
                                 action = self.agent.get_action(state, episode) # 다음 행동을 결정
-
+                                print(action.item())
                                 # 행동 a_t를 실행해 다음 상태 s_t+1 과 done 플래그 값을 결정
                                 # action에 .item()을 호출해 행동 내용을 구함
                                 observation_next,_,done,_ = self.env.step(action.item()) #reward와 info는 사용하지 않음 _처리
